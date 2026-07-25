@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getProducts, type Product } from '@/lib/db'
+import { dbVar, getProducts, type Product } from '@/lib/db'
 import { FIELDS, getContent } from '@/lib/content'
 import { formatPrice } from '@/lib/wa'
 import { remove, save, saveContent } from './actions'
@@ -15,6 +15,8 @@ export default async function Admin({ params }: { params: Promise<{ secret: stri
   if (!expected || secret !== expected) notFound() // URL oculta: cualquier otra cosa es 404
 
   const [products, t] = await Promise.all([getProducts(), getContent()])
+  // Diagnóstico: sólo nombres de variables, nunca valores.
+  const blobVar = Object.keys(process.env).find((k) => k.endsWith('BLOB_READ_WRITE_TOKEN'))
 
   return (
     <div className="wrap admin">
@@ -26,6 +28,15 @@ export default async function Admin({ params }: { params: Promise<{ secret: stri
           </Link>
         </div>
       </div>
+
+      <p className={`msg ${dbVar ? 'ok' : 'err'}`}>
+        {dbVar ? `Base de datos conectada (${dbVar})` : 'Base de datos NO conectada: no encontré ninguna variable que termine en DATABASE_URL o POSTGRES_URL'}
+      </p>
+      <p className={`msg ${blobVar ? 'ok' : 'err'}`}>
+        {blobVar
+          ? `Subida de fotos activa (${blobVar})`
+          : 'Subida de fotos NO disponible: falta la variable BLOB_READ_WRITE_TOKEN. Podés pegar URLs de imagen mientras tanto.'}
+      </p>
 
       <details className="panel admin__item">
         <summary>

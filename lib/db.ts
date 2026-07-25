@@ -14,10 +14,12 @@ export type ProductInput = Omit<Product, 'id'>
 // La integración de Neon/Postgres en Vercel prefija las variables con el nombre del
 // store (LUNE_BEAUTY_DATABASE_URL, etc.), así que se busca por sufijo. Se excluyen
 // solas las variantes _UNPOOLED / _NO_SSL / _PRISMA_URL porque no terminan igual.
-const url = Object.entries(process.env).find(
+const found = Object.entries(process.env).find(
   ([k, v]) => /(^|_)(DATABASE_URL|POSTGRES_URL)$/.test(k) && v?.startsWith('postgres')
-)?.[1]
-const sql = url ? neon(url) : null
+)
+/** Nombre de la variable usada (para el diagnóstico del panel). Nunca el valor. */
+export const dbVar = found?.[0] ?? null
+const sql = found ? neon(found[1] as string) : null
 
 // ponytail: la migración es un CREATE TABLE IF NOT EXISTS cacheado en la primera query.
 // Si algún día hay más de una tabla, pasar a SQL versionado / drizzle-kit.
