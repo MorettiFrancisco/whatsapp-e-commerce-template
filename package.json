@@ -1,0 +1,22 @@
+{
+  "name": "lune-beauty",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --test lib/wa.test.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
+    "@vercel/blob": "^1.1.1",
+    "next": "^15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.1",
+    "typescript": "^5.8.3"
+  }
+}
