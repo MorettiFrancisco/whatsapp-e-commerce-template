@@ -452,5 +452,9 @@ footer.foot {
   flex: 0 0 48px;
 }
 .danger { background: #fff; border: 1px solid #f0c2cf; color: #b23b5e; }
+.msg { font-size: 13px; border-radius: 12px; padding: 10px 12px; margin: 0; }
+.msg.err { background: #fdf0f4; color: #a3324f; border: 1px solid #f0c2cf; }
+.msg.ok { background: #eefaf3; color: #0f7048; border: 1px solid #bfe8d3; }
+.btn:disabled { opacity: 0.6; }
 .checkline { display: flex; align-items: center; gap: 10px; min-height: 46px; }
 .checkline input { width: 22px; height: 22px; accent-color: var(--brand); }

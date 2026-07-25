@@ -4,6 +4,7 @@ import { getProducts, type Product } from '@/lib/db'
 import { FIELDS, getContent } from '@/lib/content'
 import { formatPrice } from '@/lib/wa'
 import { remove, save, saveContent } from './actions'
+import { PanelForm } from './PanelForm'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { robots: { index: false, follow: false } }
@@ -36,7 +37,7 @@ export default async function Admin({ params }: { params: Promise<{ secret: stri
           </span>
           <span className="muted">editar ▾</span>
         </summary>
-        <form action={saveContent}>
+        <PanelForm action={saveContent} submit="Guardar landing">
           <input type="hidden" name="secret" value={secret} />
           {FIELDS.map((f) => (
             <div className="field" key={f.key}>
@@ -48,10 +49,7 @@ export default async function Admin({ params }: { params: Promise<{ secret: stri
               )}
             </div>
           ))}
-          <button className="btn block" type="submit">
-            Guardar landing
-          </button>
-        </form>
+        </PanelForm>
       </details>
 
       <section className="panel">
@@ -82,13 +80,10 @@ export default async function Admin({ params }: { params: Promise<{ secret: stri
               <summary className="muted" style={{ fontSize: 13, padding: '6px 0' }}>
                 Eliminar producto
               </summary>
-              <form action={remove}>
+              <PanelForm action={remove} submit={`Sí, eliminar «${p.name}»`} danger>
                 <input type="hidden" name="secret" value={secret} />
                 <input type="hidden" name="id" value={p.id} />
-                <button className="btn sm danger block" type="submit">
-                  Sí, eliminar «{p.name}»
-                </button>
-              </form>
+              </PanelForm>
             </details>
           </details>
         ))}
@@ -100,7 +95,7 @@ export default async function Admin({ params }: { params: Promise<{ secret: stri
 
 function ProductForm({ secret, p }: { secret: string; p?: Product }) {
   return (
-    <form action={save}>
+    <PanelForm action={save} submit={p ? 'Guardar cambios' : 'Agregar al catálogo'}>
       <input type="hidden" name="secret" value={secret} />
       {p && <input type="hidden" name="id" value={p.id} />}
       <div className="field">
@@ -141,9 +136,6 @@ function ProductForm({ secret, p }: { secret: string; p?: Product }) {
         <input type="checkbox" name="in_stock" defaultChecked={p ? p.in_stock : true} />
         Disponible para la venta
       </label>
-      <button className="btn block" type="submit">
-        {p ? 'Guardar cambios' : 'Agregar al catálogo'}
-      </button>
-    </form>
+    </PanelForm>
   )
 }

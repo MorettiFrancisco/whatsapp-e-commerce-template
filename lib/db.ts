@@ -11,14 +11,23 @@ export type Product = {
 }
 export type ProductInput = Omit<Product, 'id'>
 
-const url = process.env.DATABASE_URL
+// Según cómo se conecte Postgres en Vercel (Neon, Supabase, el marketplace) la
+// connection string aparece con distintos nombres: se acepta cualquiera.
+const url =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL_UNPOOLED ||
+  process.env.POSTGRES_URL_NON_POOLING
 const sql = url ? neon(url) : null
 
 // ponytail: la migración es un CREATE TABLE IF NOT EXISTS cacheado en la primera query.
 // Si algún día hay más de una tabla, pasar a SQL versionado / drizzle-kit.
 let ready: Promise<unknown> | null = null
 function db() {
-  if (!sql) throw new Error('Falta DATABASE_URL')
+  if (!sql)
+    throw new Error(
+      'No hay base de datos conectada: en Vercel entrá a Storage → Postgres → Connect y volvé a deployar.'
+    )
   ready ??= Promise.all([
     sql`
     CREATE TABLE IF NOT EXISTS products (
