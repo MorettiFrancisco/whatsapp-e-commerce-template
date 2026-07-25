@@ -23,16 +23,22 @@ async function run(fd: FormData, fn: () => Promise<string>): Promise<State> {
   }
 }
 
+// Vercel nombra el token BLOB_READ_WRITE_TOKEN, pero si el store tiene nombre propio
+// le pone un prefijo (ej: LUNE_BLOB_READ_WRITE_TOKEN): sirve cualquiera que termine así.
+const blobToken = () => Object.entries(process.env).find(([k]) => k.endsWith('BLOB_READ_WRITE_TOKEN'))?.[1]
+
 async function imageFrom(fd: FormData): Promise<string> {
   const file = fd.get('file') as File | null
   const url = String(fd.get('image') ?? '').trim()
   if (!file || file.size === 0) return url
-  if (!process.env.BLOB_READ_WRITE_TOKEN)
+  const token = blobToken()
+  if (!token)
     throw new Error(
-      'Para subir fotos hay que conectar Vercel Blob (Storage → Blob → Connect y redeploy). ' +
+      'Para subir fotos hay que conectar Vercel Blob (Storage → Blob → Connect). ' +
+        'Si ya lo conectaste, hacé Redeploy: las variables nuevas recién entran en un deployment nuevo. ' +
         'Mientras tanto podés pegar la URL de la imagen en el campo de abajo.'
     )
-  const blob = await put(`productos/${file.name}`, file, { access: 'public', addRandomSuffix: true })
+  const blob = await put(`productos/${file.name}`, file, { access: 'public', addRandomSuffix: true, token })
   return blob.url
 }
 
