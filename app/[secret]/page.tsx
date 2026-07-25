@@ -26,12 +26,6 @@ export default async function Admin({ params }: { params: Promise<{ secret: stri
         </div>
       </div>
 
-      <p className="note">
-        Esta URL es tu llave: guardala en favoritos y no la compartas. {products.length} producto
-        {products.length === 1 ? '' : 's'} cargados. El logo se cambia reemplazando el archivo{' '}
-        <b>public/logo.jpg</b> del proyecto.
-      </p>
-
       <details className="panel admin__item">
         <summary>
           <span style={{ flex: 1 }}>
