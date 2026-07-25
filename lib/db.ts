@@ -11,13 +11,12 @@ export type Product = {
 }
 export type ProductInput = Omit<Product, 'id'>
 
-// Según cómo se conecte Postgres en Vercel (Neon, Supabase, el marketplace) la
-// connection string aparece con distintos nombres: se acepta cualquiera.
-const url =
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL ||
-  process.env.DATABASE_URL_UNPOOLED ||
-  process.env.POSTGRES_URL_NON_POOLING
+// La integración de Neon/Postgres en Vercel prefija las variables con el nombre del
+// store (LUNE_BEAUTY_DATABASE_URL, etc.), así que se busca por sufijo. Se excluyen
+// solas las variantes _UNPOOLED / _NO_SSL / _PRISMA_URL porque no terminan igual.
+const url = Object.entries(process.env).find(
+  ([k, v]) => /(^|_)(DATABASE_URL|POSTGRES_URL)$/.test(k) && v?.startsWith('postgres')
+)?.[1]
 const sql = url ? neon(url) : null
 
 // ponytail: la migración es un CREATE TABLE IF NOT EXISTS cacheado en la primera query.
@@ -26,7 +25,8 @@ let ready: Promise<unknown> | null = null
 function db() {
   if (!sql)
     throw new Error(
-      'No hay base de datos conectada: en Vercel entrá a Storage → Postgres → Connect y volvé a deployar.'
+      'No hay base de datos conectada: en Vercel entrá a Storage → Postgres → Connect y volvé a deployar. ' +
+        'La variable tiene que terminar en DATABASE_URL o POSTGRES_URL.'
     )
   ready ??= Promise.all([
     sql`
